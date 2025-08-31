@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lua Playground</title>
+    <script src="https://unpkg.com/fengari-web@0.1.4/dist/fengari-web.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .playground {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            min-height: 600px;
+        }
+
+        .editor-section {
+            background: #f8f9fa;
+            border-right: 2px solid #e9ecef;
+        }
+
+        .output-section {
+            background: #1e1e1e;
+            color: #f8f8f2;
+        }
+
+        .section-header {
+            padding: 16px 24px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .output-section .section-header {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            border-bottom: 2px solid #404040;
+        }
+
+        .code-editor {
+            width: 100%;
+            height: 400px;
+            border: none;
+            padding: 20px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            background: #f8f9fa;
+            resize: none;
+            outline: none;
+        }
+
+        .output {
+            padding: 20px;
+            height: 400px;
+            overflow-y: auto;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+
+        .controls {
+            padding: 20px 24px;
+            background: #f8f9fa;
+            border-top: 2px solid #e9ecef;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .run-btn {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .run-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(40, 167, 69, 0.3);
+        }
+
+        .clear-btn {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .clear-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(108, 117, 125, 0.3);
+        }
+
+        .examples {
+            padding: 20px 24px;
+            background: #e9ecef;
+            border-top: 2px solid #dee2e6;
+        }
+
+        .examples h3 {
+            margin-bottom: 12px;
+            color: #495057;
+        }
+
+        .example-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            margin: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        .example-btn:hover {
+            background: #0056b3;
+            transform: translateY(-1px);
+        }
+
+        .error {
+            color: #ff6b6b;
+        }
+
+        .success {
+            color: #51cf66;
+        }
+
+        @media (max-width: 768px) {
+            .playground {
+                grid-template-columns: 1fr;
+            }
+            
+            .editor-section {
+                border-right: none;
+                border-bottom: 2px solid #e9ecef;
+            }
+            
+            .controls {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌙 Lua Playground</h1>
+            <p>Write and run Lua code instantly in your browser</p>
+        </div>
+        
+        <div class="playground">
+            <div class="editor-section">
+                <div class="section-header">📝 Code Editor</div>
+                <textarea class="code-editor" id="codeEditor" placeholder="-- Write your Lua code here
+print('Hello, Lua!')
+
+-- Variables and types
+local name = 'World'
+local number = 42
+local isTrue = true
+
+-- Functions
+function greet(person)
+    return 'Hello, ' .. person .. '!'
+end
+
+print(greet(name))
+print('Number:', number)
+print('Boolean:', isTrue)">-- Write your Lua code here
+print('Hello, Lua!')
+
+-- Variables and types
+local name = 'World'
+local number = 42
+local isTrue = true
+
+-- Functions
+function greet(person)
+    return 'Hello, ' .. person .. '!'
+end
+
+print(greet(name))
+print('Number:', number)
+print('Boolean:', isTrue)</textarea>
+            </div>
+            
+            <div class="output-section">
+                <div class="section-header">📤 Output</div>
+                <div class="output" id="output">Click "Run Code" to see the output here...</div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button class="run-btn" onclick="runLuaCode()">▶️ Run Code</button>
+            <button class="clear-btn" onclick="clearOutput()">🗑️ Clear Output</button>
+        </div>
+        
+        <div class="examples">
+            <h3>📚 Quick Examples:</h3>
+            <button class="example-btn" onclick="loadExample('hello')">Hello World</button>
+            <button class="example-btn" onclick="loadExample('table')">Tables</button>
+            <button class="example-btn" onclick="loadExample('loop')">Loops</button>
+            <button class="example-btn" onclick="loadExample('function')">Functions</button>
+            <button class="example-btn" onclick="loadExample('math')">Math Operations</button>
+        </div>
+    </div>
+
+    <script>
+        let outputDiv = document.getElementById('output');
+        let codeEditor = document.getElementById('codeEditor');
+
+        // Capture print output
+        let capturedOutput = '';
+        
+        function captureOutput(text) {
+            capturedOutput += text + '\n';
+        }
+
+        function runLuaCode() {
+            try {
+                capturedOutput = '';
+                outputDiv.innerHTML = '<span class="success">Running...</span>';
+                
+                const code = codeEditor.value;
+                
+                // Create a custom print function that captures output
+                const wrappedCode = `
+                    local originalPrint = print
+                    function print(...)
+                        local args = {...}
+                        local output = ""
+                        for i, v in ipairs(args) do
+                            if i > 1 then output = output .. "\\t" end
+                            output = output .. tostring(v)
+                        end
+                        js.global:captureOutput(output)
+                    end
+                    
+                    ${code}
+                `;
+                
+                // Execute the Lua code
+                fengari.load(wrappedCode)();
+                
+                // Display the captured output
+                if (capturedOutput.trim()) {
+                    outputDiv.innerHTML = `<span class="success">✅ Execution completed:</span>\n\n${capturedOutput}`;
+                } else {
+                    outputDiv.innerHTML = '<span class="success">✅ Code executed successfully (no output)</span>';
+                }
+                
+            } catch (error) {
+                outputDiv.innerHTML = `<span class="error">❌ Error:</span>\n\n${error.message}`;
+            }
+        }
+
+        function clearOutput() {
+            outputDiv.innerHTML = 'Output cleared. Click "Run Code" to execute your Lua script.';
+            capturedOutput = '';
+        }
+
+        function loadExample(type) {
+            const examples = {
+                hello: `-- Hello World Example
+print("Hello, World!")
+print("Welcome to Lua!")
+
+local greeting = "Lua is awesome!"
+print(greeting)`,
+
+                table: `-- Tables Example
+-- Creating a table
+local fruits = {"apple", "banana", "orange"}
+
+-- Accessing elements
+print("First fruit:", fruits[1])
+print("Second fruit:", fruits[2])
+
+-- Table as dictionary
+local person = {
+    name = "Alice",
+    age = 30,
+    city = "New York"
+}
+
+print("Name:", person.name)
+print("Age:", person.age)
+
+-- Adding elements
+fruits[4] = "grape"
+print("Fourth fruit:", fruits[4])`,
+
+                loop: `-- Loops Example
+print("=== For Loop ===")
+for i = 1, 5 do
+    print("Count:", i)
+end
+
+print("\\n=== While Loop ===")
+local count = 1
+while count <= 3 do
+    print("While count:", count)
+    count = count + 1
+end
+
+print("\\n=== Table Iteration ===")
+local colors = {"red", "green", "blue"}
+for index, color in ipairs(colors) do
+    print("Color " .. index .. ":", color)
+end`,
+
+                function: `-- Functions Example
+-- Simple function
+function add(a, b)
+    return a + b
+end
+
+-- Function with multiple returns
+function getNameAndAge()
+    return "Bob", 25
+end
+
+-- Recursive function
+function factorial(n)
+    if n <= 1 then
+        return 1
+    else
+        return n * factorial(n - 1)
+    end
+end
+
+-- Using the functions
+print("5 + 3 =", add(5, 3))
+
+local name, age = getNameAndAge()
+print("Name:", name, "Age:", age)
+
+print("Factorial of 5:", factorial(5))`,
+
+                math: `-- Math Operations Example
+local a = 10
+local b = 3
+
+print("=== Basic Operations ===")
+print("Addition:", a + b)
+print("Subtraction:", a - b)
+print("Multiplication:", a * b)
+print("Division:", a / b)
+print("Modulo:", a % b)
+print("Power:", a ^ 2)
+
+print("\\n=== Math Functions ===")
+print("Square root of 16:", math.sqrt(16))
+print("Absolute value of -5:", math.abs(-5))
+print("Max of 10 and 20:", math.max(10, 20))
+print("Min of 10 and 20:", math.min(10, 20))
+print("Random number:", math.random(1, 100))`
+            };
+
+            codeEditor.value = examples[type];
+        }
+
+        // Auto-run on Ctrl+Enter
+        codeEditor.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'Enter') {
+                runLuaCode();
+            }
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'977f098a545c8065',t:'MTc1NjY2OTYyMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
